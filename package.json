@@ -5,11 +5,13 @@
   "dependencies": {
     "bootstrap": "^4.1.1",
     "papaparse": "^4.5.0",
+    "prop-types": "^15.6.2",
     "react": "^16.4.1",
+    "react-data-grid": "^4.0.7",
     "react-dom": "^16.4.1",
     "react-dropzone": "^4.2.12",
     "react-scripts": "1.1.4",
-    "strip-bom": "^3.0.0"
+    "recharts": "^1.0.0-beta.10"
   },
   "scripts": {
     "start": "react-scripts start",
