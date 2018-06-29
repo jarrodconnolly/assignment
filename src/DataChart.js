@@ -19,7 +19,7 @@ class DataChart extends Component {
                    margin={{ top: 5, right: 20, left: 20, bottom: 35 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="Date" />
-          <YAxis label="Rank"/>
+          <YAxis label="Rank" width={100}/>
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="Google" stroke="blue" />

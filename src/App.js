@@ -3,9 +3,7 @@ import './App.css';
 import Upload from './Upload';
 import Papa from 'papaparse';
 import DataChart from './DataChart';
-import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 import ReactDataGrid from 'react-data-grid';
-
 
 class App extends Component {
 
@@ -18,13 +16,11 @@ class App extends Component {
     this.onRowsDeselected = this.onRowsDeselected.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
     this.processChartData = this.processChartData.bind(this);
-    this.matchesSelectedKeyword = this.matchesSelectedKeyword.bind(this);
     this.state = {
       rawData:[],
       chartData:[],
       keywords:[],
-      selectedIndexes:[],
-      selectedKeyword: ''
+      selectedIndexes:[]
     };
   }
 
@@ -110,25 +106,28 @@ class App extends Component {
     const selectedKeyword = rows[0].row
       ? rows[0].row.Keyword
       : '';
-    this.setState({
-      selectedIndexes: [selectedRowIndex],
-      selectedKeyword: selectedKeyword
+
+    this.setState(() => {
+      return {
+        selectedIndexes: [selectedRowIndex]
+      }
     });
+
     console.log(`Selected Keyword: ${selectedKeyword}`)
 
-    this.processChartData();
+    this.processChartData(selectedKeyword);
   };
 
-  matchesSelectedKeyword(row) {
-    return row.Keyword === this.state.selectedKeyword;
-  }
-
-  processChartData() {
+  processChartData(selectedKeyword) {
 
     const chartData = this.state.rawData
-      .filter(this.matchesSelectedKeyword);
+      .filter((row) => {
+        return row.Keyword === selectedKeyword;
+      });
 
-    this.setState({chartData:chartData});
+    this.setState(() => {
+      return {chartData:chartData}
+    });
   }
 
   onRowsDeselected = () => {
