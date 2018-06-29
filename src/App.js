@@ -1,21 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
 import Upload from './Upload';
-import Papa from 'papaparse';
 import DataChart from './DataChart';
 import ReactDataGrid from 'react-data-grid';
 
 class App extends Component {
-
   constructor() {
-    super()
-    this.onDrop = this.onDrop.bind(this);
-    this.rowGetter = this.rowGetter.bind(this);
-    this.handleGridSort = this.handleGridSort.bind(this);
-    this.onRowsSelected = this.onRowsSelected.bind(this);
-    this.onRowsDeselected = this.onRowsDeselected.bind(this);
-    this.onRowClick = this.onRowClick.bind(this);
-    this.processChartData = this.processChartData.bind(this);
+    super();
     this.state = {
       rawData:[],
       chartData:[],
@@ -24,63 +15,17 @@ class App extends Component {
     };
   }
 
-  // remove utf-16 bom in source data file
-  stripBom(input) {
-    if (input.charCodeAt(0) === 0xFF && input.charCodeAt(1) === 0xFE) {
-      return input.slice(2);
-    } else {
-      return input;
-    }
-  }
-
-  onDrop(acceptedFiles) {
-    acceptedFiles.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileAsBinaryString = this.stripBom(reader.result);
-        const result = Papa.parse(fileAsBinaryString,
-          {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true
-          });
-
-        this.processUploadData(result.data);
-      };
-      reader.onabort = () => console.log('file reading was aborted');
-      reader.onerror = () => console.log('file reading has failed');
-
-      reader.readAsBinaryString(file);
-    });
-  }
-
-  processUploadData(data) {
-
-    console.log(data);
-
-    // unique keywords
-    const keywords = new Set();
-    const keywordData = [];
-    data.forEach((row) => {
-      if(!keywords.has(row.Keyword)) {
-        keywords.add(row.Keyword);
-        keywordData.push({
-          Keyword:row.Keyword,
-          Searches:parseInt(row["Global Monthly Searches"], 10)
-        })
-      }
-    });
-
-    console.log(keywords)
-
+  // callback function passed to Upload component
+  // to update required state
+  updateUploadedData = (rawData, uniqueKeywords) => {
     this.setState({
-      rawData:data,
-      keywords:keywordData
+      rawData:rawData,
+      keywords:uniqueKeywords
     });
   }
 
-  handleGridSort(sortColumn, sortDirection) {
-
+  // data grid sort handler
+  handleGridSort = (sortColumn, sortDirection) => {
     const comparer = (a, b) => {
       if (sortDirection === 'ASC') {
         return (a[sortColumn] > b[sortColumn]) ? 1 : -1;
@@ -97,11 +42,13 @@ class App extends Component {
     this.setState({ keywords: rows });
   };
 
-  rowGetter(i) {
+  // data grid data provider method
+  rowGetter = (i) => {
     return this.state.keywords[i];
   };
 
-  onRowsSelected(rows) {
+  // data grid row selection handler
+  onRowsSelected = (rows) => {
     const selectedRowIndex = rows[0].rowIdx;
     const selectedKeyword = rows[0].row
       ? rows[0].row.Keyword
@@ -118,7 +65,7 @@ class App extends Component {
     this.processChartData(selectedKeyword);
   };
 
-  processChartData(selectedKeyword) {
+  processChartData = (selectedKeyword) => {
 
     const chartData = this.state.rawData
       .filter((row) => {
@@ -134,7 +81,7 @@ class App extends Component {
     this.setState({selectedIndexes:[]});
   };
 
-  onRowClick(rowId,row) {
+  onRowClick = (rowId,row) => {
     this.onRowsSelected([{row:row,rowIdx:rowId}]);
   }
 
@@ -203,7 +150,7 @@ class App extends Component {
             className="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
             <h1 className="h2">Dashboard</h1>
             <div className="btn-toolbar mb-2 mb-md-0">
-              <Upload onDrop={this.onDrop}/>
+              <Upload updateUploadedData={this.updateUploadedData}/>
             </div>
           </div>
 
