@@ -1,103 +1,131 @@
-import React, { Component } from 'react';
-import './App.css';
-import Upload from './Upload';
-import DataChart from './DataChart';
-import ReactDataGrid from 'react-data-grid';
+import React, { Component } from 'react'
+import './App.css'
+import Upload from './Upload'
+import DataChart from './DataChart'
+import ReactDataGrid from 'react-data-grid'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import moment from 'moment'
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor () {
+    super()
     this.state = {
-      rawData:[],
-      chartData:[],
-      keywords:[],
-      selectedIndexes:[]
-    };
+      rawData: [],
+      chartData: [],
+      keywords: [],
+      selectedIndexes: [],
+      selectedKeyword: '',
+      startDate: moment('2016-02-01'),
+      endDate: moment('2016-02-15'),
+    }
   }
 
   // callback function passed to Upload component
   // to update required state
   updateUploadedData = (rawData, uniqueKeywords) => {
     this.setState({
-      rawData:rawData,
-      keywords:uniqueKeywords
-    });
+      rawData: rawData,
+      keywords: uniqueKeywords,
+    }, () => {
+      this.handleGridSort("Searches", "DESC");
+    })
   }
 
   // data grid sort handler
   handleGridSort = (sortColumn, sortDirection) => {
     const comparer = (a, b) => {
       if (sortDirection === 'ASC') {
-        return (a[sortColumn] > b[sortColumn]) ? 1 : -1;
+        return (a[sortColumn] > b[sortColumn]) ? 1 : -1
       } else if (sortDirection === 'DESC') {
-        return (a[sortColumn] < b[sortColumn]) ? 1 : -1;
+        return (a[sortColumn] < b[sortColumn]) ? 1 : -1
       }
-    };
-
+    }
 
     const rows = sortDirection === 'NONE'
       ? this.state.keywords.slice(0)
-      : this.state.keywords.sort(comparer);
+      : this.state.keywords.sort(comparer)
 
-    this.setState({ keywords: rows });
-  };
+    this.setState({keywords: rows})
+  }
 
   // data grid data provider method
   rowGetter = (i) => {
-    return this.state.keywords[i];
-  };
+    return this.state.keywords[i]
+  }
 
   // data grid row selection handler
   onRowsSelected = (rows) => {
-    const selectedRowIndex = rows[0].rowIdx;
+    const selectedRowIndex = rows[0].rowIdx
     const selectedKeyword = rows[0].row
       ? rows[0].row.Keyword
-      : '';
+      : ''
 
     this.setState(() => {
       return {
-        selectedIndexes: [selectedRowIndex]
+        selectedIndexes: [selectedRowIndex],
       }
-    });
+    })
 
     console.log(`Selected Keyword: ${selectedKeyword}`)
 
-    this.processChartData(selectedKeyword);
-  };
+    this.setState({selectedKeyword:selectedKeyword}, () => {
+      this.processChartData();
+    })
 
-  processChartData = (selectedKeyword) => {
+  }
+
+  processChartData = () => {
 
     const chartData = this.state.rawData
       .filter((row) => {
-        return row.Keyword === selectedKeyword;
+        return row.Keyword === this.state.selectedKeyword;
+      })
+      .filter((row) => {
+        return moment(row.Date).isSameOrAfter(this.state.startDate)
+          && moment(row.Date).isSameOrBefore(this.state.endDate);
       });
 
     this.setState(() => {
-      return {chartData:chartData}
-    });
+      return {chartData: chartData}
+    })
   }
 
   onRowsDeselected = () => {
-    this.setState({selectedIndexes:[]});
-  };
-
-  onRowClick = (rowId,row) => {
-    this.onRowsSelected([{row:row,rowIdx:rowId}]);
+    this.setState({selectedIndexes: []})
   }
 
-  render() {
+  onRowClick = (rowId, row) => {
+    this.onRowsSelected([{row: row, rowIdx: rowId}])
+  }
+
+  handleChangeStart = (date) => {
+    this.setState({startDate: date}, () => {
+      this.processChartData();
+    })
+  }
+
+  handleChangeEnd = (date) => {
+    this.setState({endDate: date}, () => {
+      this.processChartData();
+    })
+  }
+
+  render () {
 
     const columns = [
       {
         key: 'Keyword',
         name: 'Search Keyword',
-        sortable: true
+        sortable: true,
+        resizable: true
       },
       {
         key: 'Searches',
         name: 'Global Monthly Searches',
-        sortable: true
-      }];
+        sortable: true,
+        resizable: true
+      }]
 
     return (
       <div>
@@ -155,35 +183,91 @@ class App extends Component {
           </div>
 
           <div className="container-fluid">
-            <DataChart chartData={this.state.chartData}/>
+            <div className="card">
+              <div className="card-header">
+                Data Chart
+              </div>
+              <div className="card-body">
+                <DataChart chartData={this.state.chartData}/>
+              </div>
+            </div>
           </div>
 
-          <div className="container-fluid">
-            <ReactDataGrid
-              onRowClick={this.onRowClick}
-              onGridSort={this.handleGridSort}
-              columns={columns}
-              rowGetter={this.rowGetter}
-              rowsCount={this.state.keywords.length}
-              minHeight={300}
-              rowSelection={{
-                showCheckbox: false,
-                enableShiftSelect: false,
-                onRowsSelected: this.onRowsSelected,
-                onRowsDeselected: this.onRowsDeselected,
-                selectBy: {
-                  indexes: this.state.selectedIndexes
-                }
-              }}
-            />
+          <div className="container-fluid" style={{marginTop:20}}>
+            <div className="card">
+              <div className="card-header">
+                Filters
+              </div>
+              <div className="card-body">
+                <form>
+                  <div className="row">
+                    <div className="form-group col-md-2">
+                      <label htmlFor="dateStart">Start Date</label>
+                      <DatePicker
+                        id="dateStart"
+                        dateFormat="YYYY-MM-DD"
+                        selected={this.state.startDate}
+                        selectsStart
+                        startDate={this.state.startDate}
+                        endDate={this.state.endDate}
+                        onChange={this.handleChangeStart}
+                      />
+                    </div>
+                    <div className="form-group col-md-2">
+                      <label htmlFor="dateEnd">End Date</label>
+                      <DatePicker
+                        id="dateEnd"
+                        dateFormat="YYYY-MM-DD"
+                        selected={this.state.endDate}
+                        selectsEnd
+                        startDate={this.state.startDate}
+                        endDate={this.state.endDate}
+                        onChange={this.handleChangeEnd}
+                      />
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div className="container-fluid" style={{marginTop:20}}>
+            <div className="card">
+              <div className="card-header">
+                Select Keyword
+              </div>
+              <div className="card-body">
+                <div className="container-fluid">
+                <ReactDataGrid
+                  sortColumn={"Searches"}
+                  sortDirection={"DESC"}
+                  onRowClick={this.onRowClick}
+                  onGridSort={this.handleGridSort}
+                  columns={columns}
+                  rowGetter={this.rowGetter}
+                  rowsCount={this.state.keywords.length}
+                  minHeight={300}
+                  rowSelection={{
+                    showCheckbox: false,
+                    enableShiftSelect: false,
+                    onRowsSelected: this.onRowsSelected,
+                    onRowsDeselected: this.onRowsDeselected,
+                    selectBy: {
+                      indexes: this.state.selectedIndexes,
+                    },
+                  }}
+                />
+                </div>
+              </div>
+            </div>
           </div>
 
         </main>
 
 
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App
