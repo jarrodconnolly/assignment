@@ -1,11 +1,13 @@
-import React, { Component } from 'react'
-import './App.css'
-import Upload from './Upload'
-import DataChart from './DataChart'
-import ReactDataGrid from 'react-data-grid'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import moment from 'moment'
+import React, { Component } from 'react';
+import './App.css';
+import Upload from './components/Upload';
+import DataChart from './components/DataChart';
+import ReactDataGrid from 'react-data-grid';
+import Navbar from './components/Navbar';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import 'open-iconic/font/css/open-iconic-bootstrap.min.css';
+import moment from 'moment';
 
 class App extends Component {
   constructor () {
@@ -129,14 +131,8 @@ class App extends Component {
 
     return (
       <div>
-        <nav className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-          <a className="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Assignment</a>
-          <ul className="navbar-nav px-3">
-            <li className="nav-item text-nowrap">
-              <a className="nav-link" href="#">Sign out</a>
-            </li>
-          </ul>
-        </nav>
+
+        <Navbar />
 
         <div className="container-fluid">
           <div className="row">
@@ -144,27 +140,33 @@ class App extends Component {
               <div className="sidebar-sticky">
                 <ul className="nav flex-column">
                   <li className="nav-item">
-                    <a className="nav-link active" href="#">
-                      <span data-feather="home"></span>
-                      Dashboard <span className="sr-only">(current)</span>
+                    <a className="nav-link active">
+                      <span className="oi oi-home" title="Home" aria-hidden="true"/>
+                      Dashboard
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="#">
-                      <span data-feather="file"></span>
-                      Other
+                    <a className="nav-link">
+                      <span className="oi oi-book" title="Documents" aria-hidden="true"/>
+                      Documents
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="#">
-                      <span data-feather="shopping-cart"></span>
-                      Menu
+                    <a className="nav-link">
+                      <span className="oi oi-person" title="Profile" aria-hidden="true"/>
+                      Profile
                     </a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="#">
-                      <span data-feather="users"></span>
-                      Items
+                    <a className="nav-link">
+                      <span className="oi oi-beaker" title="Lab" aria-hidden="true"/>
+                      Lab
+                    </a>
+                  </li>
+                  <li className="nav-item">
+                    <a className="nav-link">
+                      <span className="oi oi-cog" title="Settings" aria-hidden="true"/>
+                      Settings
                     </a>
                   </li>
                 </ul>
@@ -188,7 +190,7 @@ class App extends Component {
                 Data Chart
               </div>
               <div className="card-body">
-                <DataChart chartData={this.state.chartData}/>
+                <DataChart chartData={this.state.chartData} processChartData={this.processChartData}/>
               </div>
             </div>
           </div>
@@ -200,10 +202,12 @@ class App extends Component {
               </div>
               <div className="card-body">
                 <form>
-                  <div className="row">
-                    <div className="form-group col-md-2">
-                      <label htmlFor="dateStart">Start Date</label>
+
+                  <div className="form-group row">
+                    <label htmlFor="dateStart" className="col-sm-2 col-form-label">Start Date</label>
+                    <div className="col-sm-10">
                       <DatePicker
+                        className={"form-control"}
                         id="dateStart"
                         dateFormat="YYYY-MM-DD"
                         selected={this.state.startDate}
@@ -213,9 +217,13 @@ class App extends Component {
                         onChange={this.handleChangeStart}
                       />
                     </div>
-                    <div className="form-group col-md-2">
-                      <label htmlFor="dateEnd">End Date</label>
+                  </div>
+
+                  <div className="form-group row">
+                    <label htmlFor="dateEnd" className="col-sm-2 col-form-label">End Date</label>
+                    <div className="col-sm-10">
                       <DatePicker
+                        className={"form-control"}
                         id="dateEnd"
                         dateFormat="YYYY-MM-DD"
                         selected={this.state.endDate}
@@ -226,6 +234,7 @@ class App extends Component {
                       />
                     </div>
                   </div>
+
                 </form>
               </div>
             </div>

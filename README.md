@@ -8,6 +8,8 @@
 1. Visit `http://localhost:3000/` in your browser.
 1. Use the "Upload Data" button to upload the CSV file into the application.
 1. Select a keywords from the list to view the graph.
+1. Select a chart type from the tabs across the top of the chart
+1. Filter the date range using the filters section
 
 ## Future Additions
 
@@ -16,3 +18,5 @@
   * Market: CA-en, US-en, GB-en
 * Compare different keywords against one another
 * Implement data export
+* Extract more components from App.js
+  * LeftNav, Filters. etc..

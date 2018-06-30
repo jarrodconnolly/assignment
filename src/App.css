@@ -82,3 +82,11 @@
 .sort-asc {
     color: orange;
 }
+
+.oi {
+    padding-right:10px;
+}
+
+.hidden {
+    display: none;
+}
