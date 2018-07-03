@@ -4,21 +4,11 @@ import Papa from 'papaparse'
 
 export default class Upload extends Component {
 
-  // remove utf-16 bom in source data file
-  stripBom = (input) => {
-    if (input.charCodeAt(0) === 0xFF && input.charCodeAt(1) === 0xFE) {
-      return input.slice(2);
-    } else {
-      return input;
-    }
-  }
-
   onDrop = (acceptedFiles) => {
     acceptedFiles.forEach(file => {
       const reader = new FileReader();
       reader.onload = () => {
-        const fileAsBinaryString = this.stripBom(reader.result);
-        const result = Papa.parse(fileAsBinaryString,
+        const result = Papa.parse(reader.result,
           {
             header: true,
             dynamicTyping: true,
@@ -30,7 +20,7 @@ export default class Upload extends Component {
       reader.onabort = () => console.log('file reading was aborted');
       reader.onerror = () => console.log('file reading has failed');
 
-      reader.readAsBinaryString(file);
+      reader.readAsText(file);
     });
   }
 
@@ -38,10 +28,16 @@ export default class Upload extends Component {
 
     console.log(data);
 
-    // unique keywords
+    let maxGlobalMonthlySearches = 0;
     const keywords = new Set();
     const keywordData = [];
+
+    // iterate the data once to find:
+    //   unique keywords
+    //   max global monthly searches
     data.forEach((row) => {
+      // add new keyword to our list if we do not already have it
+      // this is for the keyword selection list
       if(!keywords.has(row.Keyword)) {
         keywords.add(row.Keyword);
         keywordData.push({
@@ -49,11 +45,25 @@ export default class Upload extends Component {
           Searches:parseInt(row["Global Monthly Searches"], 10)
         })
       }
+
+      // find the maxGlobalMonthlySearches
+      if(row["Global Monthly Searches"] > maxGlobalMonthlySearches) {
+        maxGlobalMonthlySearches = row["Global Monthly Searches"];
+      }
+
+    });
+
+    // populate the data for the weighted graphs
+    data.forEach((row) => {
+      row["Google-weighted"] = row["Google"] * (row["Global Monthly Searches"] / maxGlobalMonthlySearches);
+      row["Google Base Rank-weighted"] = row["Google Base Rank"] * (row["Global Monthly Searches"] / maxGlobalMonthlySearches);
+      row["Bing-weighted"] = row["Bing"] * (row["Global Monthly Searches"] / maxGlobalMonthlySearches);
+      row["Yahoo-weighted"] = row["Yahoo"] * (row["Global Monthly Searches"] / maxGlobalMonthlySearches);
     });
 
     console.log(keywords)
 
-    this.props.updateUploadedData(data, keywordData);
+    this.props.updateUploadedData(data, keywordData, maxGlobalMonthlySearches);
   }
 
 

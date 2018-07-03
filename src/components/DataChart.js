@@ -20,6 +20,7 @@ const toPercent = (decimal, fixed = 0) => {
 }
 
 class DataChart extends Component {
+
   selectTab = (tabName) => {
     document.getElementById('chartLine').className = 'hidden';
     document.getElementById('chartBar').className = 'hidden';
@@ -53,6 +54,7 @@ class DataChart extends Component {
     }
     this.props.processChartData();
   }
+
   render () {
     return (
       <div>

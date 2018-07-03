@@ -18,14 +18,37 @@ class App extends Component {
       keywords: [],
       selectedIndexes: [],
       selectedKeyword: '',
-      startDate: moment('2016-02-01'),
-      endDate: moment('2016-02-15'),
+      startDate: moment(),
+      endDate: moment(),
     }
   }
 
   // callback function passed to Upload component
   // to update required state
   updateUploadedData = (rawData, uniqueKeywords) => {
+
+    let minDate = moment(rawData[0].Date);
+    let maxDate = moment(rawData[0].Date);
+
+    rawData.forEach((row) => {
+      const rowDate = moment(row.Date);
+      if(rowDate.isAfter(maxDate)) {
+        maxDate = moment(rowDate);
+      }
+      if(rowDate.isBefore(minDate)) {
+        minDate = moment(rowDate);
+      }
+    });
+
+    this.setState(() => {
+      return {
+        minDate: minDate,
+        maxDate: maxDate,
+        startDate: minDate,
+        endDate: maxDate,
+      }
+    })
+
     this.setState({
       rawData: rawData,
       keywords: uniqueKeywords,
@@ -78,18 +101,20 @@ class App extends Component {
   }
 
   processChartData = () => {
-
     const chartData = this.state.rawData
       .filter((row) => {
         return row.Keyword === this.state.selectedKeyword;
       })
       .filter((row) => {
-        return moment(row.Date).isSameOrAfter(this.state.startDate)
-          && moment(row.Date).isSameOrBefore(this.state.endDate);
+        const rowDate = moment(row.Date);
+        return rowDate.isSameOrAfter(this.state.startDate)
+          && rowDate.isSameOrBefore(this.state.endDate);
       });
 
     this.setState(() => {
-      return {chartData: chartData}
+      return {
+        chartData: chartData,
+      }
     })
   }
 
@@ -214,6 +239,8 @@ class App extends Component {
                         selectsStart
                         startDate={this.state.startDate}
                         endDate={this.state.endDate}
+                        minDate={this.state.minDate}
+                        maxDate={this.state.maxDate}
                         onChange={this.handleChangeStart}
                       />
                     </div>
@@ -230,6 +257,8 @@ class App extends Component {
                         selectsEnd
                         startDate={this.state.startDate}
                         endDate={this.state.endDate}
+                        minDate={this.state.minDate}
+                        maxDate={this.state.maxDate}
                         onChange={this.handleChangeEnd}
                       />
                     </div>

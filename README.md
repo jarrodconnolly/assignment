@@ -13,10 +13,11 @@
 
 ## Future Additions
 
+* Implement data export
+* Complete implementation of weighted data
 * Add more filters to view data in different ways
   * Device: smartphone/desktop
   * Market: CA-en, US-en, GB-en
 * Compare different keywords against one another
-* Implement data export
 * Extract more components from App.js
   * LeftNav, Filters. etc..
