@@ -3,6 +3,7 @@
 
 ## Instalation & Usage
 
+1. Clone projet from this GitHub repo
 1. `npm install`
 1. `npm start`
 1. Visit `http://localhost:3000/` in your browser
