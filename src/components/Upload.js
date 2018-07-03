@@ -4,6 +4,8 @@ import Papa from 'papaparse'
 
 export default class Upload extends Component {
 
+  // handles reading uploaded files
+  // processes the csv into json data
   onDrop = (acceptedFiles) => {
     acceptedFiles.forEach(file => {
       const reader = new FileReader();
@@ -24,6 +26,10 @@ export default class Upload extends Component {
     });
   }
 
+  // processes the converted json data
+  // finds the maxGlobalMonthlySearches for weighted charts
+  // builds a unique keyword list for the data grid
+  // calls callback to App.js to update the data
   processUploadData = (data) => {
 
     console.log(data);
@@ -67,6 +73,7 @@ export default class Upload extends Component {
   }
 
 
+  // main render function
   render() {
     let dropzoneRef;
     return (

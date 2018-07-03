@@ -1,5 +1,6 @@
 import React from 'react';
 
+// simple function navbar component for now
 const NavBar = () => {
   return (
     <nav className="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">

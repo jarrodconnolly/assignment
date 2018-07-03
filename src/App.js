@@ -13,13 +13,13 @@ class App extends Component {
   constructor () {
     super()
     this.state = {
-      rawData: [],
-      chartData: [],
-      keywords: [],
-      selectedIndexes: [],
-      selectedKeyword: '',
-      startDate: moment(),
-      endDate: moment(),
+      rawData: [], // original raw data
+      chartData: [], // processed/filtered data to display
+      keywords: [], // unique keyword list
+      selectedIndexes: [], // used by datagrid for row selection
+      selectedKeyword: '', // currently selected keyword
+      startDate: moment(), // filter start date
+      endDate: moment(), // filter end date
     }
   }
 
@@ -27,6 +27,8 @@ class App extends Component {
   // to update required state
   updateUploadedData = (rawData, uniqueKeywords) => {
 
+    // find the min and max dates in our data
+    // to restrict the date filters
     let minDate = moment(rawData[0].Date);
     let maxDate = moment(rawData[0].Date);
 
@@ -40,6 +42,7 @@ class App extends Component {
       }
     });
 
+    // the min/max and initial start/end filter dates
     this.setState(() => {
       return {
         minDate: minDate,
@@ -49,6 +52,7 @@ class App extends Component {
       }
     })
 
+    // set the data for display
     this.setState({
       rawData: rawData,
       keywords: uniqueKeywords,
@@ -100,6 +104,9 @@ class App extends Component {
 
   }
 
+  // filter the chart data
+  // by keyword
+  // by filter dates
   processChartData = () => {
     const chartData = this.state.rawData
       .filter((row) => {
@@ -118,26 +125,31 @@ class App extends Component {
     })
   }
 
+  // data grid event
   onRowsDeselected = () => {
     this.setState({selectedIndexes: []})
   }
 
+  // data grid event
   onRowClick = (rowId, row) => {
     this.onRowsSelected([{row: row, rowIdx: rowId}])
   }
 
+  // filter start date event
   handleChangeStart = (date) => {
     this.setState({startDate: date}, () => {
       this.processChartData();
     })
   }
 
+  // filter end date event
   handleChangeEnd = (date) => {
     this.setState({endDate: date}, () => {
       this.processChartData();
     })
   }
 
+  // main render function
   render () {
 
     const columns = [

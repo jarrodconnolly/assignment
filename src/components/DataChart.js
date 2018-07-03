@@ -15,12 +15,14 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
+// used by the area chart to calculat the Y axis
 const toPercent = (decimal, fixed = 0) => {
   return `${(decimal * 100).toFixed(fixed)}%`
 }
 
 class DataChart extends Component {
 
+  // manual old school javascript tab selection :)
   selectTab = (tabName) => {
     document.getElementById('chartLine').className = 'hidden';
     document.getElementById('chartBar').className = 'hidden';
@@ -55,6 +57,7 @@ class DataChart extends Component {
     this.props.processChartData();
   }
 
+  // main component render function
   render () {
     return (
       <div>
